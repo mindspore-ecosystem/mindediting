@@ -53,28 +53,21 @@ def imresizemex(inimg, weights, indices, dim):
     out_shape[dim] = w_shape[0]
     outimg = np.zeros(out_shape)
     if dim == 0:
-        index = 1
-        slice_start, slice_end = indice, i_img
-        outimg_start, outimg_end = i_w, i_img
         for i_img in range(in_shape[1]):
             for i_w in range(w_shape[0]):
                 w = weights[i_w, :]
-                indice = indices[i_w, :]
-                im_slice = inimg[indice, i_img].astype(np.float64)
+                ind = indices[i_w, :]
+                im_slice = inimg[ind, i_img].astype(np.float64)
                 mult = np.multiply(np.squeeze(im_slice, axis=0), w.T)
                 outimg[i_w, i_img] = np.sum(mult, axis=0)
     elif dim == 1:
-        index = 0
-        slice_start, slice_end = i_img, indice
-        outimg_start, outimg_end = i_img, i_w
-
-    for i_img in range(in_shape[index]):
-        for i_w in range(w_shape[0]):
-            w = weights[i_w, :]
-            indice = indices[i_w, :]
-            im_slice = inimg[slice_start, slice_end].astype(np.float64)
-            mult = np.multiply(np.squeeze(im_slice, axis=0), w.T)
-            outimg[outimg_start, outimg_end] = np.sum(mult, axis=0)
+        for i_img in range(in_shape[0]):
+            for i_w in range(w_shape[0]):
+                w = weights[i_w, :]
+                ind = indices[i_w, :]
+                im_slice = inimg[i_img, ind].astype(np.float64)
+                mult = np.multiply(np.squeeze(im_slice, axis=0), w.T)
+                outimg[i_img, i_w] = np.sum(mult, axis=0)
 
     if inimg.dtype == np.uint8:
         outimg = np.clip(outimg, 0, 255)
